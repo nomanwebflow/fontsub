@@ -37,7 +37,6 @@ A web application for creating optimized font subsets with custom character sets
 cd frontend
 npm install
 npm run dev
-# Runs on http://localhost:5173
 ```
 
 ### Backend Setup
@@ -47,58 +46,12 @@ python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8001
-# Runs on http://localhost:8001
 ```
-
-## Deployment to Cloudflare
-
-### Step 1: Install Wrangler CLI
-```bash
-npm install -g wrangler
-```
-
-### Step 2: Login to Cloudflare
-```bash
-wrangler login
-```
-
-### Step 3: Deploy Frontend to Cloudflare Pages
-
-```bash
-cd frontend
-npm run deploy
-```
-
-Or manually:
-```bash
-cd frontend
-npm run build
-wrangler pages deploy dist --project-name=font-subsetter
-```
-
-### Step 4: Deploy Backend
-
-**Option A: Use a Python-compatible platform**
-- Railway: https://railway.app
-- Fly.io: https://fly.io  
-- Render: https://render.com
-
-**Option B: Convert to Cloudflare Workers (TypeScript)**
-The Python backend would need to be rewritten in TypeScript for Workers.
-
-### Step 5: Update Environment Variables
-
-Update `frontend/.env.production` with your deployed backend URL:
-```env
-VITE_API_URL=https://your-backend-url.com
-```
-
-Then rebuild and redeploy the frontend.
 
 ## Environment Variables
 
 ### Frontend
-- `VITE_API_URL`: Backend API URL (default: http://localhost:8001)
+- `VITE_API_URL`: Backend API URL
 
 ### Backend
 - `CORS_ORIGINS`: Allowed CORS origins (comma-separated)
@@ -121,18 +74,7 @@ The application uses the following fontTools options:
 
 ## API Documentation
 
-API documentation available at:
-- Local: http://localhost:8001/docs
-- Production: https://your-api-url.com/docs
-
-## CI/CD with GitHub Actions
-
-The repository includes a GitHub Actions workflow for automatic deployment.
-
-Set these secrets in your GitHub repository settings:
-- `CLOUDFLARE_API_TOKEN`: Your Cloudflare API token
-- `CLOUDFLARE_ACCOUNT_ID`: Your Cloudflare account ID  
-- `VITE_API_URL`: Your backend API URL
+API documentation is available at `/docs` endpoint when running the backend server.
 
 ## License
 
