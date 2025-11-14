@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "shadcn": {
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    },
+    "font-subsetter": {
+      "command": "node",
+      "args": ["mcp-server/dist/index.js"],
+      "env": {
+        "API_URL": "http://localhost:8000"
+      }
+    }
+  }
+}
