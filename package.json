@@ -1,4 +1,15 @@
 {
+  "name": "font-subsetter-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "FontSub"
+  ],
+  "scripts": {
+    "build": "cd FontSub && npm install && npm run build",
+    "dev": "cd FontSub && npm run dev",
+    "start": "cd FontSub && npm start"
+  },
   "dependencies": {
     "@google-cloud/observability-mcp": "^0.2.0"
   }
