@@ -1,0 +1,72 @@
+# Git
+.git
+.gitignore
+.github
+
+# Node modules
+node_modules
+frontend/node_modules
+**/node_modules
+
+# Build artifacts
+frontend/dist
+frontend/build
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+.pytest_cache
+.coverage
+
+# Environment files
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+*.tmp
+*.temp
+uploads
+outputs
+backend/uploads
+backend/outputs
+
+# Documentation
+*.md
+!README.md
+
+# MCP
+.mcp.json
+mcp-server
+
+# Webflow
+wrangler.toml
+frontend/wrangler.toml
