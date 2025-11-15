@@ -1,6 +1,6 @@
 import type { FontMetadata, SubsetRequest, SubsetResponse, ExportRequest, ExportResponse } from '@/types/font';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = '/api';
 
 class FontApi {
   private sessionId: string | null = null;
@@ -13,7 +13,7 @@ class FontApi {
       formData.append('session_id', this.sessionId);
     }
 
-    const response = await fetch(`${API_BASE_URL}/api/upload`, {
+    const response = await fetch(`${API_BASE_URL}/upload`, {
       method: 'POST',
       body: formData,
     });
@@ -44,7 +44,7 @@ class FontApi {
       custom_font_name: customFontName,
     };
 
-    const response = await fetch(`${API_BASE_URL}/api/subset`, {
+    const response = await fetch(`${API_BASE_URL}/subset`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ class FontApi {
       font_name: customFontName,
     };
 
-    const response = await fetch(`${API_BASE_URL}/api/export`, {
+    const response = await fetch(`${API_BASE_URL}/export`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -91,14 +91,14 @@ class FontApi {
     if (!this.sessionId) {
       throw new Error('No active session');
     }
-    return `${API_BASE_URL}/api/download/${this.sessionId}/${filename}`;
+    return `${API_BASE_URL}/download/${this.sessionId}/${filename}`;
   }
 
   async cleanupSession(): Promise<void> {
     if (!this.sessionId) return;
 
     try {
-      await fetch(`${API_BASE_URL}/api/session/${this.sessionId}`, {
+      await fetch(`${API_BASE_URL}/session/${this.sessionId}`, {
         method: 'DELETE',
       });
     } catch (error) {

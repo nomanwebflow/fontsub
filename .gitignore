@@ -47,3 +47,9 @@ htmlcov/
 
 # TypeScript
 *.tsbuildinfo
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/next-env.d.ts

@@ -15,11 +15,12 @@ A web application for creating optimized font subsets with custom character sets
 ## Tech Stack
 
 ### Frontend
-- React + TypeScript
-- Vite
+- Next.js 15 + TypeScript
+- React with App Router
 - Tailwind CSS
 - shadcn/ui components
 - Switzer font
+- Edge Runtime support for Webflow Cloud
 
 ### Backend
 - Python FastAPI
@@ -36,7 +37,12 @@ A web application for creating optimized font subsets with custom character sets
 ```bash
 cd frontend
 npm install
-npm run dev
+npm run dev  # Runs on http://localhost:3000
+```
+
+Create a `.env.local` file in the frontend directory:
+```bash
+API_URL=http://localhost:8000
 ```
 
 ### Backend Setup
@@ -48,10 +54,24 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8001
 ```
 
+## Deployment
+
+### Webflow Cloud
+
+This application is configured for deployment to Webflow Cloud with Next.js and Edge Runtime support.
+
+**See [WEBFLOW_DEPLOYMENT.md](./WEBFLOW_DEPLOYMENT.md) for detailed deployment instructions.**
+
+Quick deployment checklist:
+1. Deploy the FastAPI backend to your preferred hosting provider
+2. Connect your GitHub repository to Webflow Cloud
+3. Set the `API_URL` environment variable in Webflow Cloud
+4. Webflow Cloud will automatically detect and deploy the Next.js app
+
 ## Environment Variables
 
 ### Frontend
-- `VITE_API_URL`: Backend API URL
+- `API_URL`: Backend API URL (injected at runtime in Webflow Cloud)
 
 ### Backend
 - `CORS_ORIGINS`: Allowed CORS origins (comma-separated)
