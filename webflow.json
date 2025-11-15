@@ -1,4 +1,16 @@
 {
+  "cloud": {
+    "framework": "nextjs",
+    "directory": "FontSub"
+  },
+  "cosmic": {
+    "framework": "nextjs",
+    "directory": "FontSub"
+  },
+  "devlink": {
+    "rootDir": "./FontSub/src/devlink",
+    "cssModules": true
+  },
   "telemetry": {
     "global": {
       "allowTelemetry": true,
