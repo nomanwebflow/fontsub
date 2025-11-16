@@ -8,6 +8,7 @@ import os
 from typing import List, Dict, Optional
 import logging
 
+import zipfile
 from app.models.font_models import FontMetadata, GlyphInfo
 
 logger = logging.getLogger(__name__)
@@ -15,6 +16,33 @@ logger = logging.getLogger(__name__)
 
 class FontService:
     """Service for font processing operations"""
+
+    def create_zip_archive(self, file_paths: List[str], session_id: str) -> Optional[str]:
+        """
+        Create a zip archive from a list of files.
+        Args:
+            file_paths: List of paths to the files to be zipped
+            session_id: The session ID, used for naming the output zip file
+        Returns:
+            Path to the created zip archive, or None if no files were provided
+        """
+        if not file_paths:
+            return None
+
+        output_dir = Path(file_paths[0]).parent
+        zip_filename = f"font_subsets_{session_id}.zip"
+        zip_filepath = output_dir / zip_filename
+
+        try:
+            with zipfile.ZipFile(zip_filepath, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                for file_path in file_paths:
+                    p = Path(file_path)
+                    if p.exists() and p.is_file():
+                        zipf.write(file_path, p.name)
+            return str(zip_filepath)
+        except Exception as e:
+            logger.error(f"Error creating zip archive: {str(e)}")
+            return None
 
     def extract_metadata(self, font_path: str) -> FontMetadata:
         """

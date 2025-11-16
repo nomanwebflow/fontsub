@@ -91,9 +91,8 @@ export function ExportPanel({ selectedCharacters, fontFamily }: ExportPanelProps
   };
 
   const handleDownloadAll = () => {
-    exportedFiles.forEach(file => {
-      setTimeout(() => handleDownload(file.filename), 100);
-    });
+    const url = fontApi.getDownloadAllUrl();
+    window.open(url, '_blank');
   };
 
   return (

@@ -87,6 +87,14 @@ class FontApi {
     return response.json();
   }
 
+
+  getDownloadAllUrl(): string {
+    if (!this.sessionId) {
+      throw new Error('No active session');
+    }
+    return `${API_BASE_URL}/api/download-all/${this.sessionId}`;
+  }
+
   getDownloadUrl(filename: string): string {
     if (!this.sessionId) {
       throw new Error('No active session');

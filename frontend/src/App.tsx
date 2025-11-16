@@ -3,14 +3,10 @@ import { FontUpload } from '@/components/font/FontUpload'
 import { FontPreview } from '@/components/font/FontPreview'
 import { CharacterSelection } from '@/components/font/CharacterSelection'
 import { ExportPanel } from '@/components/font/ExportPanel'
+import { AboutModal } from '@/components/AboutModal'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { FontMetadata } from '@/types/font'
 import './App.css'
-
-interface FontFamily {
-  familyName: string
-  fonts: FontMetadata[]
-}
 
 // Default English character set (U+0020-007E, U+00A0-00FF, U+0152-0153, U+0160, U+0161, U+0178, U+017D-017E)
 const getDefaultEnglishChars = () => {
@@ -73,22 +69,63 @@ function App() {
 
       <div className="container mx-auto py-8 px-4 max-w-5xl">
         <header className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Font Subsetter</h1>
-          <p className="text-muted-foreground">
-            Upload, preview, and create optimized font subsets
-            {familyCount > 0 && (
-              <span className="ml-2 font-medium" aria-live="polite">
-                ({familyCount} {familyCount === 1 ? 'family' : 'families'}
-                {variantCount !== familyCount && `, ${variantCount} ${variantCount === 1 ? 'variant' : 'variants'}`})
-              </span>
-            )}
+          <h1 className="text-4xl font-bold mb-3">
+            Font Subsetter
+          </h1>
+          <p className="text-lg text-muted-foreground mb-4">
+            Upload fonts, select characters, and download optimized subsets. Reduce file size by up to 90%.
           </p>
+          <div className="flex items-center gap-4 flex-wrap text-sm text-muted-foreground mb-3">
+            <span className="flex items-center gap-1">
+              <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
+              100% Free
+            </span>
+            <span className="flex items-center gap-1">
+              <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
+              No Signup Required
+            </span>
+            <span className="flex items-center gap-1">
+              <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
+              All Major Formats
+            </span>
+            <span className="flex items-center gap-1">
+              <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
+              Instant Download
+            </span>
+          </div>
+          <div className="flex items-center gap-4 flex-wrap text-sm text-muted-foreground">
+            <AboutModal />
+            <span>•</span>
+            <span>
+              By{' '}
+              <a
+                href="https://www.vertexexperience.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+                aria-label="Visit Vertex Experience website"
+              >
+                Vertex Experience
+              </a>
+            </span>
+            {familyCount > 0 && (
+              <>
+                <span>•</span>
+                <span className="font-medium" aria-live="polite">
+                  {familyCount} {familyCount === 1 ? 'family' : 'families'}
+                  {variantCount !== familyCount && `, ${variantCount} ${variantCount === 1 ? 'variant' : 'variants'}`}
+                </span>
+              </>
+            )}
+          </div>
         </header>
 
         <main id="main-content" className="space-y-6">
           {/* Upload Section */}
           <section aria-labelledby="upload-heading">
-            <h2 id="upload-heading" className="sr-only">Upload Fonts</h2>
+            <h2 id="upload-heading" className="text-2xl font-semibold mb-4">
+              Step 1: Upload Your Font Files
+            </h2>
             <FontUpload onFontsUploaded={handleFontsUploaded} />
           </section>
 
@@ -96,7 +133,9 @@ function App() {
           {fontFamilies.length > 0 && (
             <>
               <section aria-labelledby="preview-heading">
-                <h2 id="preview-heading" className="sr-only">Font Preview</h2>
+                <h2 id="preview-heading" className="text-2xl font-semibold mb-4">
+                  Step 2: Preview Font Metadata
+                </h2>
                 <Tabs defaultValue="0" className="w-full" aria-label="Font family tabs">
                   <TabsList
                     className="grid w-full"
@@ -126,7 +165,9 @@ function App() {
 
               {/* Character Selection Section - applies to all fonts */}
               <section aria-labelledby="character-selection-heading">
-                <h2 id="character-selection-heading" className="sr-only">Character Selection</h2>
+                <h2 id="character-selection-heading" className="text-2xl font-semibold mb-4">
+                  Step 3: Select Characters for Your Font Subset
+                </h2>
                 <CharacterSelection
                   metadata={fonts[0]}
                   selectedCharacters={selectedCharacters}
@@ -136,7 +177,9 @@ function App() {
 
               {/* Export Section - exports all fonts */}
               <section aria-labelledby="export-heading">
-                <h2 id="export-heading" className="sr-only">Generate and Export</h2>
+                <h2 id="export-heading" className="text-2xl font-semibold mb-4">
+                  Step 4: Generate & Download Optimized Font
+                </h2>
                 <ExportPanel
                   selectedCharacters={selectedCharacters}
                   fontFamily={fontFamilies.map(f => f.familyName).join(', ')}

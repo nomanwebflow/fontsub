@@ -232,6 +232,37 @@ async def export_font(request: ExportRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+
+@app.get("/api/download-all/{session_id}")
+async def download_all_fonts(session_id: str):
+    """
+    Download all exported fonts as a single zip archive.
+    Args:
+        session_id: Session ID
+    Returns:
+        Zip file download
+    """
+    try:
+        # Get all subset paths from session
+        subset_paths = session_manager.get_subset_paths(session_id)
+        if not subset_paths:
+            raise HTTPException(status_code=404, detail="No subsets found for this session")
+
+        # Create a zip archive of all subset fonts
+        zip_path = font_service.create_zip_archive(subset_paths, session_id)
+        if not zip_path:
+            raise HTTPException(status_code=500, detail="Could not create zip archive")
+
+        return FileResponse(
+            path=zip_path,
+            filename=Path(zip_path).name,
+            media_type="application/zip"
+        )
+    except Exception as e:
+        logger.error(f"Error creating zip archive: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/download/{session_id}/{filename}")
 async def download_font(session_id: str, filename: str):
     """

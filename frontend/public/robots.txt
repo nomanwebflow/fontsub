@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Sitemap: https://fontsub-frontend-1010835317622.europe-west1.run.app/sitemap.xml
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1

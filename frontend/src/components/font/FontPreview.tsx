@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import type { FontMetadata } from '@/types/font';
 
 interface FontPreviewProps {
@@ -7,6 +9,8 @@ interface FontPreviewProps {
 }
 
 export function FontPreview({ metadata, fontDataUrl }: FontPreviewProps) {
+  const [showAllCharacters, setShowAllCharacters] = useState<boolean>(false);
+
   // Handle both single and array of fonts
   const fonts = Array.isArray(metadata) ? metadata : [metadata];
   const primaryFont = fonts[0];
@@ -136,22 +140,36 @@ export function FontPreview({ metadata, fontDataUrl }: FontPreviewProps) {
 
         {/* Character Set Preview */}
         <div className="space-y-3">
-          <h4 className="text-sm font-medium">Character Set Preview</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium">Character Set Preview</h4>
+            {primaryFont.character_set.length > 200 && (
+              <Button
+                variant="link"
+                size="sm"
+                onClick={() => setShowAllCharacters(!showAllCharacters)}
+                className="text-xs h-auto p-0"
+              >
+                {showAllCharacters ? 'Show less' : `View all ${primaryFont.character_set.length} characters`}
+              </Button>
+            )}
+          </div>
           <div className="border rounded-lg p-4 max-h-48 overflow-auto">
             <div
               className="flex flex-wrap gap-1 text-lg leading-relaxed"
               style={fontDataUrl ? { fontFamily: 'UploadedFont' } : {}}
             >
-              {primaryFont.character_set.slice(0, 200).map((char, index) => (
-                <span
-                  key={index}
-                  className="hover:bg-accent hover:text-accent-foreground px-1 rounded cursor-default"
-                  title={`U+${char.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0')}`}
-                >
-                  {char}
-                </span>
-              ))}
-              {primaryFont.character_set.length > 200 && (
+              {primaryFont.character_set
+                .slice(0, showAllCharacters ? primaryFont.character_set.length : 200)
+                .map((char, index) => (
+                  <span
+                    key={index}
+                    className="hover:bg-accent hover:text-accent-foreground px-1 rounded cursor-default"
+                    title={`U+${char.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0')}`}
+                  >
+                    {char}
+                  </span>
+                ))}
+              {!showAllCharacters && primaryFont.character_set.length > 200 && (
                 <span className="text-muted-foreground text-sm px-2">
                   +{primaryFont.character_set.length - 200} more
                 </span>

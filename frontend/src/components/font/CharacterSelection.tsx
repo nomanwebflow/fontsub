@@ -29,6 +29,7 @@ const getDefaultEnglishChars = () => {
 
 export function CharacterSelection({ metadata, onSelectionChange, selectedCharacters }: CharacterSelectionProps) {
   const [activePreset, setActivePreset] = useState<string>('default-english');
+  const [showAllCharacters, setShowAllCharacters] = useState<boolean>(false);
 
   const handleTextInputChange = (value: string) => {
     const uniqueChars = Array.from(new Set(value.split(''))).join('');
@@ -86,7 +87,7 @@ export function CharacterSelection({ metadata, onSelectionChange, selectedCharac
           <Label htmlFor="text-input">Enter text to generate subset</Label>
           <textarea
             id="text-input"
-            className="w-full min-h-[200px] p-4 bg-slate-500 text-slate-100 border border-slate-700 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary font-mono text-sm"
+            className="w-full min-h-[200px] p-4 bg-[hsl(var(--primary)/.05)] text-slate-100 border border-border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary font-mono text-sm"
             placeholder="Type or paste any text here. All unique characters will be included in your subset..."
             value={selectedCharacters}
             onChange={(e) => handleTextInputChange(e.target.value)}
@@ -163,7 +164,19 @@ export function CharacterSelection({ metadata, onSelectionChange, selectedCharac
         {/* Selected Characters Preview */}
         {selectedCharacters && (
           <div className="space-y-2">
-            <Label id="character-preview-label">Selected Characters Preview</Label>
+            <div className="flex items-center justify-between">
+              <Label id="character-preview-label">Selected Characters Preview</Label>
+              {selectedCharacters.length > 100 && (
+                <Button
+                  variant="link"
+                  size="sm"
+                  onClick={() => setShowAllCharacters(!showAllCharacters)}
+                  className="text-xs h-auto p-0"
+                >
+                  {showAllCharacters ? 'Show less' : `View all ${selectedCharacters.length} characters`}
+                </Button>
+              )}
+            </div>
             <div
               className="border rounded-lg p-3 max-h-32 overflow-auto bg-slate-50 dark:bg-slate-900"
               role="region"
@@ -171,18 +184,20 @@ export function CharacterSelection({ metadata, onSelectionChange, selectedCharac
               aria-describedby="character-preview-desc"
             >
               <div className="flex flex-wrap gap-1">
-                {Array.from(selectedCharacters).slice(0, 100).map((char, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-2 py-1 bg-primary/10 text-primary rounded text-sm font-mono"
-                    role="listitem"
-                  >
-                    {char === ' ' ? '␣' : char}
-                  </span>
-                ))}
-                {selectedCharacters.length > 100 && (
+                {Array.from(selectedCharacters)
+                  .slice(0, showAllCharacters ? selectedCharacters.length : 100)
+                  .map((char, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2 py-1 bg-primary/10 text-primary rounded text-sm font-mono"
+                      role="listitem"
+                    >
+                      {char === ' ' ? '␣' : char}
+                    </span>
+                  ))}
+                {!showAllCharacters && selectedCharacters.length > 100 && (
                   <span className="text-muted-foreground text-sm px-2" id="character-preview-desc">
-                    +{selectedCharacters.length - 100} more characters
+                    +{selectedCharacters.length - 100} more
                   </span>
                 )}
               </div>
