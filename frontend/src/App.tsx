@@ -70,10 +70,12 @@ function App() {
       <div className="container mx-auto py-8 px-4 max-w-5xl">
         <header className="mb-8">
           <h1 className="text-4xl font-bold mb-3">
-            Font Subsetter
+            SubsetFonts
           </h1>
           <p className="text-lg text-muted-foreground mb-4">
-            Upload fonts, select characters, and download optimized subsets. Reduce file size by up to 90%.
+            SubsetFonts is a free tool that trims your fonts for you. You upload a file, pick the characters you need, and get a smaller version back. It feels simple, almost too simple, but it works.
+            <br /><br />
+            Smaller fonts load faster. Your site feels lighter right away. You can use TTF, OTF, WOFF, or WOFF2. Just drop the file in, choose your characters, and download the reduced font. No signup. No fuss. If you want a quick speed boost without touching your code much, this is an easy win.
           </p>
           <div className="flex items-center gap-4 flex-wrap text-sm text-muted-foreground mb-3">
             <span className="flex items-center gap-1">
@@ -99,7 +101,7 @@ function App() {
             <span>
               By{' '}
               <a
-                href="https://www.vertexexperience.com/"
+                href="https://www.vertexexperience.com/?utm_source=toolsn&utm_medium=subsetfonts"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary hover:underline"

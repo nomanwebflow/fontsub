@@ -8,7 +8,7 @@ export function SeoContent() {
           Font subsetting is a crucial web performance optimization technique that creates smaller font files by including only the characters you actually need. Instead of loading an entire font family with thousands of glyphs, you can reduce file sizes by 70-90% for faster page loads.
         </p>
 
-        <h3 className="text-2xl font-semibold mb-3 mt-8">Why Use a Font Subsetter?</h3>
+        <h3 className="text-2xl font-semibold mb-3 mt-8">Why Use SubsetFonts?</h3>
         <ul className="list-disc pl-6 mb-6 space-y-3">
           <li className="leading-relaxed">
             <strong>Faster Website Loading:</strong> Smaller font files mean faster page load times and better Core Web Vitals scores
@@ -25,7 +25,7 @@ export function SeoContent() {
         </ul>
 
         <h3 className="text-2xl font-semibold mb-3 mt-8">Supported Font Formats</h3>
-        <p className="mb-4">Our free online font subsetter supports all major web font formats:</p>
+        <p className="mb-4">SubsetFonts supports all major web font formats:</p>
         <ul className="list-disc pl-6 mb-6 space-y-3">
           <li className="leading-relaxed">
             <strong>TTF (TrueType Font):</strong> Universal format supported by all browsers
@@ -85,9 +85,9 @@ export function SeoContent() {
 
         <div className="space-y-6">
           <div>
-            <h4 className="text-xl font-semibold mb-2">Is this font subsetter really free?</h4>
+            <h4 className="text-xl font-semibold mb-2">Is SubsetFonts really free?</h4>
             <p className="leading-relaxed">
-              Yes! Font Subsetter is 100% free to use. There are no hidden costs, file size limits, or required subscriptions. You can process unlimited fonts and download as many optimized subsets as you need.
+              Yes! SubsetFonts is 100% free to use. There are no hidden costs, file size limits, or required subscriptions. You can process unlimited fonts and download as many optimized subsets as you need.
             </p>
           </div>
 

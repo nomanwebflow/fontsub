@@ -1,4 +1,8 @@
-  @import url('https://fonts.cdnfonts.com/css/switzer');
+/* Import only the Switzer font weights we use (400, 500, 600, 700) with font-display: swap */
+@import '@carrot-kpi/switzer-font/400.css';
+@import '@carrot-kpi/switzer-font/500.css';
+@import '@carrot-kpi/switzer-font/600.css';
+@import '@carrot-kpi/switzer-font/700.css';
 
 @tailwind base;
 @tailwind components;
@@ -70,5 +74,13 @@
   }
   textarea {
     background-color: hsl(var(--primary) / 0.05);
+  }
+  /* Light mode: black text for textarea */
+  :root textarea {
+    color: hsl(0 0% 0%);
+  }
+  /* Dark mode: keep default foreground color */
+  .dark textarea {
+    color: hsl(var(--foreground));
   }
 }

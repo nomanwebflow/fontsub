@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
-Sitemap: https://fontsub-frontend-1010835317622.europe-west1.run.app/sitemap.xml
+Sitemap: https://subsetfonts.com/sitemap.xml
 
 User-agent: Googlebot
 Allow: /

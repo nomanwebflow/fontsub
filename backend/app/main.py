@@ -2,7 +2,7 @@
 Font Subsetting Backend API
 FastAPI application for font processing and subsetting operations.
 """
-from fastapi import FastAPI, UploadFile, File, HTTPException, Form
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pathlib import Path
@@ -11,6 +11,9 @@ import shutil
 from typing import List, Optional
 import logging
 from dotenv import load_dotenv
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 # Load environment variables
 load_dotenv()
@@ -23,12 +26,19 @@ from app.utils.session_manager import SessionManager
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Initialize rate limiter
+limiter = Limiter(key_func=get_remote_address)
+
 # Initialize FastAPI app
 app = FastAPI(
     title="Font Subsetting API",
     description="API for font subsetting and optimization",
     version="1.0.0"
 )
+
+# Add rate limiter to app state
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS configuration
 app.add_middleware(
@@ -51,13 +61,16 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 
 
 @app.get("/")
-async def root():
+@limiter.limit("100/minute")
+async def root(request: Request):
     """Health check endpoint"""
     return {"status": "ok", "message": "Font Subsetting API is running"}
 
 
 @app.post("/api/upload", response_model=FontMetadata)
+@limiter.limit("10/minute")
 async def upload_font(
+    request: Request,
     file: UploadFile = File(...),
     session_id: Optional[str] = Form(None)
 ):
@@ -65,6 +78,7 @@ async def upload_font(
     Upload a font file and extract metadata.
 
     Args:
+        request: FastAPI request object (for rate limiting)
         file: Font file (.ttf, .otf, .woff, .woff2)
         session_id: Optional session ID for tracking
 
@@ -113,11 +127,13 @@ async def upload_font(
 
 
 @app.get("/api/fonts/{session_id}", response_model=List[FontMetadata])
-async def get_fonts(session_id: str):
+@limiter.limit("50/minute")
+async def get_fonts(request: Request, session_id: str):
     """
     Get all fonts in a session.
 
     Args:
+        request: FastAPI request object (for rate limiting)
         session_id: Session ID
 
     Returns:
@@ -139,42 +155,44 @@ async def get_fonts(session_id: str):
 
 
 @app.post("/api/subset")
-async def generate_subset(request: SubsetRequest):
+@limiter.limit("20/minute")
+async def generate_subset(request: Request, subset_request: SubsetRequest):
     """
     Generate subsets for all fonts in the session based on selected characters.
 
     Args:
-        request: SubsetRequest with session_id, characters, and options
+        request: FastAPI request object (for rate limiting)
+        subset_request: SubsetRequest with session_id, characters, and options
 
     Returns:
         Success message with subset info for all fonts
     """
     try:
         # Get all fonts from session
-        fonts = session_manager.get_fonts(request.session_id)
+        fonts = session_manager.get_fonts(subset_request.session_id)
 
         if not fonts:
             raise HTTPException(status_code=404, detail="No fonts found in session")
 
         # Create output directory for session
-        output_dir = OUTPUT_DIR / request.session_id
+        output_dir = OUTPUT_DIR / subset_request.session_id
         output_dir.mkdir(exist_ok=True)
 
         # Clear previous subset paths
-        session_manager.clear_subset_paths(request.session_id)
+        session_manager.clear_subset_paths(subset_request.session_id)
 
         # Generate subset for each font
         subset_paths = []
         for metadata in fonts:
             subset_path = font_service.create_subset(
                 font_path=metadata.file_path,
-                characters=request.characters,
+                characters=subset_request.characters,
                 output_dir=str(output_dir),
-                font_name_suffix=request.font_name_suffix,
-                custom_font_name=request.custom_font_name
+                font_name_suffix=subset_request.font_name_suffix,
+                custom_font_name=subset_request.custom_font_name
             )
             subset_paths.append(subset_path)
-            session_manager.add_subset_path(request.session_id, subset_path)
+            session_manager.add_subset_path(subset_request.session_id, subset_path)
 
         logger.info(f"Generated {len(subset_paths)} subsets")
 
@@ -182,7 +200,7 @@ async def generate_subset(request: SubsetRequest):
             "status": "success",
             "message": f"Generated {len(subset_paths)} subsets successfully",
             "subset_count": len(subset_paths),
-            "character_count": len(request.characters)
+            "character_count": len(subset_request.characters)
         }
 
     except Exception as e:
@@ -191,19 +209,21 @@ async def generate_subset(request: SubsetRequest):
 
 
 @app.post("/api/export")
-async def export_font(request: ExportRequest):
+@limiter.limit("30/minute")
+async def export_font(request: Request, export_request: ExportRequest):
     """
     Export all subset fonts in specified format(s).
 
     Args:
-        request: ExportRequest with session_id and output formats
+        request: FastAPI request object (for rate limiting)
+        export_request: ExportRequest with session_id and output formats
 
     Returns:
         Download links for all exported fonts
     """
     try:
         # Get all subset paths from session
-        subset_paths = session_manager.get_subset_paths(request.session_id)
+        subset_paths = session_manager.get_subset_paths(export_request.session_id)
 
         if not subset_paths:
             raise HTTPException(status_code=404, detail="No subsets found for this session")
@@ -213,13 +233,13 @@ async def export_font(request: ExportRequest):
         for subset_path in subset_paths:
             output_files = font_service.convert_formats(
                 font_path=subset_path,
-                formats=request.formats,
-                output_dir=str(OUTPUT_DIR / request.session_id),
-                custom_font_name=request.font_name
+                formats=export_request.formats,
+                output_dir=str(OUTPUT_DIR / export_request.session_id),
+                custom_font_name=export_request.font_name
             )
             all_output_files.extend(output_files)
 
-        logger.info(f"Exported {len(subset_paths)} fonts to formats: {request.formats}")
+        logger.info(f"Exported {len(subset_paths)} fonts to formats: {export_request.formats}")
 
         return {
             "status": "success",
@@ -234,10 +254,12 @@ async def export_font(request: ExportRequest):
 
 
 @app.get("/api/download-all/{session_id}")
-async def download_all_fonts(session_id: str):
+@limiter.limit("30/minute")
+async def download_all_fonts(request: Request, session_id: str):
     """
     Download all exported fonts as a single zip archive.
     Args:
+        request: FastAPI request object (for rate limiting)
         session_id: Session ID
     Returns:
         Zip file download
@@ -248,8 +270,15 @@ async def download_all_fonts(session_id: str):
         if not subset_paths:
             raise HTTPException(status_code=404, detail="No subsets found for this session")
 
+        # Get font metadata to use for zip filename
+        fonts = session_manager.get_fonts(session_id)
+        font_name = None
+        if fonts and len(fonts) > 0:
+            # Use the first font's family name for the zip file
+            font_name = fonts[0].family_name
+
         # Create a zip archive of all subset fonts
-        zip_path = font_service.create_zip_archive(subset_paths, session_id)
+        zip_path = font_service.create_zip_archive(subset_paths, session_id, font_name)
         if not zip_path:
             raise HTTPException(status_code=500, detail="Could not create zip archive")
 
@@ -264,11 +293,13 @@ async def download_all_fonts(session_id: str):
 
 
 @app.get("/api/download/{session_id}/{filename}")
-async def download_font(session_id: str, filename: str):
+@limiter.limit("50/minute")
+async def download_font(request: Request, session_id: str, filename: str):
     """
     Download an exported font file.
 
     Args:
+        request: FastAPI request object (for rate limiting)
         session_id: Session ID
         filename: Font filename to download
 
@@ -293,11 +324,13 @@ async def download_font(session_id: str, filename: str):
 
 
 @app.delete("/api/session/{session_id}")
-async def cleanup_session(session_id: str):
+@limiter.limit("20/minute")
+async def cleanup_session(request: Request, session_id: str):
     """
     Clean up session data and temporary files.
 
     Args:
+        request: FastAPI request object (for rate limiting)
         session_id: Session ID to clean up
 
     Returns:

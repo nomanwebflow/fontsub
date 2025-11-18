@@ -17,12 +17,13 @@ logger = logging.getLogger(__name__)
 class FontService:
     """Service for font processing operations"""
 
-    def create_zip_archive(self, file_paths: List[str], session_id: str) -> Optional[str]:
+    def create_zip_archive(self, file_paths: List[str], session_id: str, font_name: Optional[str] = None) -> Optional[str]:
         """
         Create a zip archive from a list of files.
         Args:
             file_paths: List of paths to the files to be zipped
             session_id: The session ID, used for naming the output zip file
+            font_name: Optional font family name for cleaner zip filename
         Returns:
             Path to the created zip archive, or None if no files were provided
         """
@@ -30,7 +31,16 @@ class FontService:
             return None
 
         output_dir = Path(file_paths[0]).parent
-        zip_filename = f"font_subsets_{session_id}.zip"
+
+        # Create a clean zip filename based on font name
+        if font_name:
+            # Clean the font name to be filesystem-safe
+            clean_name = "".join(c if c.isalnum() or c in ('-', '_') else '-' for c in font_name)
+            clean_name = clean_name.strip('-').lower()
+            zip_filename = f"{clean_name}-subset.zip"
+        else:
+            zip_filename = "font-subsets.zip"
+
         zip_filepath = output_dir / zip_filename
 
         try:
