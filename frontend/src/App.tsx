@@ -3,7 +3,15 @@ import { FontUpload } from '@/components/font/FontUpload'
 import { FontPreview } from '@/components/font/FontPreview'
 import { CharacterSelection } from '@/components/font/CharacterSelection'
 import { ExportPanel } from '@/components/font/ExportPanel'
-import { AboutModal } from '@/components/AboutModal'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { SeoContent } from '@/components/SeoContent'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { FontMetadata } from '@/types/font'
 import './App.css'
@@ -73,9 +81,23 @@ function App() {
             SubsetFonts
           </h1>
           <p className="text-lg text-muted-foreground mb-4">
-            SubsetFonts is a free tool that trims your fonts for you. You upload a file, pick the characters you need, and get a smaller version back. It feels simple, almost too simple, but it works.
-            <br /><br />
-            Smaller fonts load faster. Your site feels lighter right away. You can use TTF, OTF, WOFF, or WOFF2. Just drop the file in, choose your characters, and download the reduced font. No signup. No fuss. If you want a quick speed boost without touching your code much, this is an easy win.
+            SubsetFonts is a free tool that trims your fonts for you. You upload a file, pick the characters you need, and get a smaller version back. It feels simple, almost too simple, but it works.{' '}
+            <Dialog>
+              <DialogTrigger className="text-primary hover:underline cursor-pointer">
+                Learn more about font subsetting
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl">About Font Subsetting</DialogTitle>
+                  <DialogDescription>
+                    Everything you need to know about optimizing fonts for the web
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="mt-4">
+                  <SeoContent />
+                </div>
+              </DialogContent>
+            </Dialog>
           </p>
           <div className="flex items-center gap-4 flex-wrap text-sm text-muted-foreground mb-3">
             <span className="flex items-center gap-1">
@@ -96,8 +118,6 @@ function App() {
             </span>
           </div>
           <div className="flex items-center gap-4 flex-wrap text-sm text-muted-foreground">
-            <AboutModal />
-            <span>•</span>
             <span>
               By{' '}
               <a
