@@ -178,8 +178,9 @@ async def generate_subset(request: Request, subset_request: SubsetRequest):
         output_dir = OUTPUT_DIR / subset_request.session_id
         output_dir.mkdir(exist_ok=True)
 
-        # Clear previous subset paths
+        # Clear previous subset paths and exported files
         session_manager.clear_subset_paths(subset_request.session_id)
+        session_manager.clear_exported_files(subset_request.session_id)
 
         # Generate subset for each font
         subset_paths = []
@@ -239,6 +240,10 @@ async def export_font(request: Request, export_request: ExportRequest):
             )
             all_output_files.extend(output_files)
 
+            # Track exported file paths in session
+            for file_info in output_files:
+                session_manager.add_exported_file(export_request.session_id, file_info["path"])
+
         logger.info(f"Exported {len(subset_paths)} fonts to formats: {export_request.formats}")
 
         return {
@@ -265,10 +270,15 @@ async def download_all_fonts(request: Request, session_id: str):
         Zip file download
     """
     try:
-        # Get all subset paths from session
-        subset_paths = session_manager.get_subset_paths(session_id)
-        if not subset_paths:
-            raise HTTPException(status_code=404, detail="No subsets found for this session")
+        # Get all exported file paths from session (converted formats)
+        exported_files = session_manager.get_exported_files(session_id)
+
+        # If no exported files, fall back to subset paths (original format)
+        if not exported_files:
+            exported_files = session_manager.get_subset_paths(session_id)
+
+        if not exported_files:
+            raise HTTPException(status_code=404, detail="No fonts found for this session. Please generate and export fonts first.")
 
         # Get font metadata to use for zip filename
         fonts = session_manager.get_fonts(session_id)
@@ -277,8 +287,8 @@ async def download_all_fonts(request: Request, session_id: str):
             # Use the first font's family name for the zip file
             font_name = fonts[0].family_name
 
-        # Create a zip archive of all subset fonts
-        zip_path = font_service.create_zip_archive(subset_paths, session_id, font_name)
+        # Create a zip archive of all exported fonts
+        zip_path = font_service.create_zip_archive(exported_files, session_id, font_name)
         if not zip_path:
             raise HTTPException(status_code=500, detail="Could not create zip archive")
 

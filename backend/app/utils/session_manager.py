@@ -36,7 +36,8 @@ class SessionManager:
             "created_at": datetime.now(),
             "last_accessed": datetime.now(),
             "fonts": [],  # List of FontMetadata
-            "subset_paths": []  # List of subset paths
+            "subset_paths": [],  # List of subset paths
+            "exported_files": []  # List of exported file paths
         }
 
         logger.info(f"Created session: {session_id}")
@@ -150,6 +151,46 @@ class SessionManager:
         if session:
             session["subset_paths"] = []
             logger.info(f"Cleared subset paths for session: {session_id}")
+
+    def add_exported_file(self, session_id: str, file_path: str):
+        """
+        Add exported file path to session.
+
+        Args:
+            session_id: Session ID
+            file_path: Path to exported file
+        """
+        session = self.get_session(session_id)
+        if session:
+            session["exported_files"].append(file_path)
+            logger.info(f"Added exported file for session: {session_id}")
+
+    def get_exported_files(self, session_id: str) -> List[str]:
+        """
+        Get all exported file paths from session.
+
+        Args:
+            session_id: Session ID
+
+        Returns:
+            List of exported file paths
+        """
+        session = self.get_session(session_id)
+        if session:
+            return session.get("exported_files", [])
+        return []
+
+    def clear_exported_files(self, session_id: str):
+        """
+        Clear all exported file paths from session.
+
+        Args:
+            session_id: Session ID
+        """
+        session = self.get_session(session_id)
+        if session:
+            session["exported_files"] = []
+            logger.info(f"Cleared exported files for session: {session_id}")
 
     def cleanup_session(self, session_id: str):
         """
